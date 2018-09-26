@@ -35,3 +35,34 @@ ln -s /var/run/secrets/kubernetes.io/serviceaccount/ca.crt /kaniko/ssl/certs/ca.
 Kaniko will pick it up alongside its default /kaniko/ssl/certs/ca-certificates.crt and accept your registry TLS.
 It could be a volumeMount instead of a shell command.
 For the Knative step that looks up image digest we might be able to do the same mount.
+
+### Patching the Knative controller
+
+Knative will look up image digests in order to produce revisions.
+The controller (soon to be named reconciler) needs access to the image registry to do that.
+
+```bash
+# Mounts the cluster's CA over the default bundle.
+# Under the assumption that controller requires no access to public services.
+# This means that image digest lookups are _only_ supported for the local registry.
+# And that the controller can't depend on anything else external to the cluster.
+
+DEFAULT_TOKEN_NAME=$(kubectl -n knative-serving get secret -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep default-token-)
+
+kubectl -n knative-serving patch deployment/controller -p $"
+spec:
+  template:
+    spec:
+      containers:
+      - name: controller
+        volumeMounts:
+        - name: default-token
+          mountPath: /etc/ssl/certs/ca-certificates.crt
+          subPath: ca.crt
+      volumes:
+      - name: default-token
+        secret:
+          defaultMode: 420
+          secretName: $DEFAULT_TOKEN_NAME
+"
+```
