@@ -29,9 +29,9 @@ https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/
 you need to do the following in your kaniko build steps:
 
 ```
-cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt >> /kaniko/ssl/certs/ca-certificates.crt
+ln -s /var/run/secrets/kubernetes.io/serviceaccount/ca.crt /kaniko/ssl/certs/ca.crt
 ```
 
-The reason for cat instead of mount is that you presumably need access to docker hub and other external registries.
-
-For the Knative step that looks up image digest we might do fine with only the Kubernetes CA, and hence a plain volumeMount.
+Kaniko will pick it up alongside its default /kaniko/ssl/certs/ca-certificates.crt and accept your registry TLS.
+It could be a volumeMount instead of a shell command.
+For the Knative step that looks up image digest we might be able to do the same mount.
