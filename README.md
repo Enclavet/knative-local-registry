@@ -21,3 +21,17 @@ The value of such a requiement can be seen in [NodePort]() vs [LoadBalancer]() K
 where the former is impractical to use (node IP lookup, odd ports etc) but often relied on
 because it is consistent across clusters without external meddling.
 The reason we scope this out is that we haven't found an appealing solution.
+
+## Using TLS with cluster services
+
+With registry TLS certificates generated according to
+https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/
+you need to do the following in your kaniko build steps:
+
+```
+cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt >> /kaniko/ssl/certs/ca-certificates.crt
+```
+
+The reason for cat instead of mount is that you presumably need access to docker hub and other external registries.
+
+For the Knative step that looks up image digest we might do fine with only the Kubernetes CA, and hence a plain volumeMount.
