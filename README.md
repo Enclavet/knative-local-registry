@@ -96,27 +96,40 @@ spec:
 
 Similarly we can patch any Kaniko build steps that push to the registry,
 or pulls any of your local images as [FROM](https://docs.docker.com/engine/reference/builder/#from).
-For example, assuming the build step name that pushes is `export`,
+For example, assuming it's the second build step that pushes,
 as in the [nodejs-runtime](https://github.com/triggermesh/nodejs-runtime) template:
 
 ```bash
 NAMESPACE=default
 DEFAULT_TOKEN_NAME=$(kubectl -n $NAMESPACE get secret -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep default-token-)
 BUILD_TEMPLATE_NAME=runtime-nodejs
-kubectl -n $NAMESPACE patch buildtemplate.build.knative.dev/$BUILD_TEMPLATE_NAME -p $"
-spec:
-  steps:
-  - name: export
-    volumeMounts:
-    - name: default-token
-      mountPath: /kaniko/ssl/certs/ca.crt
-      subPath: ca.crt
-  volumes:
-  - name: default-token
-    secret:
-      defaultMode: 420
-      secretName: $DEFAULT_TOKEN_NAME
-"
+kubectl -n $NAMESPACE patch buildtemplate.build.knative.dev/$BUILD_TEMPLATE_NAME --type=json -p $"
+  [{
+    \"op\": \"add\",
+    \"path\": \"/spec/volumes\",
+    \"value\": [
+      {
+        \"name\": \"default-token\",
+        \"secret\": {
+          \"defaultMode\": 420,
+          \"secretName\": \"$DEFAULT_TOKEN_NAME\"
+        }
+      }
+    ]
+  }]"
+STEP_INDEX=1
+kubectl -n $NAMESPACE patch buildtemplate.build.knative.dev/$BUILD_TEMPLATE_NAME --type=json -p $"
+  [{
+    \"op\": \"add\" ,
+    \"path\": \"/spec/steps/$STEP_INDEX/volumeMounts\" ,
+    \"value\": [
+      {
+        \"mountPath\": \"/kaniko/ssl/certs/ca.crt\",
+        \"name\": \"default-token\",
+        \"subPath\": \"ca.crt\"
+      }
+    ]
+  }]"
 ```
 
 A symlink `ln -s /var/run/secrets/kubernetes.io/serviceaccount/ca.crt /kaniko/ssl/certs/ca.crt`
