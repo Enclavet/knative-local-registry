@@ -17,12 +17,12 @@ because only a sidecar would be reachable at localhost and sidecars don't run wh
 
 As [ICP](https://medium.com/@zhimin.wen/explore-knative-build-on-on-premise-kubernetes-cluster-ibm-cloud-private-b0e94e59ba9d) pioneered,
 the essential requirement for a local registry is that "The hostname of the private registry is resolvable".
-The same hostname and optional :port must work from both nodes' docker daemon and inside the cluster.
-Not necessarily resolvable anywhere else.
-If you want registry access over public network authentication is also a requirement.
+The same hostname and optional :port must work from both nodes' docker daemon and inside the cluster,
+but not necessarily from anywhere else.
+If you do want registry access over public network, [authentication](https://docs.docker.com/registry/deploying/#restricting-access) is a must.
 
 A truly portable registry setup would avoid dependencies outside the cluster.
-The value of such a requiement can be seen in `NodePort` vs `LoadBalancer` Kubernetes services,
+The value of such a requirement can be seen in `NodePort` vs `LoadBalancer` Kubernetes services,
 where the former is impractical to use (involving node IP lookup, odd ports etc) but often relied on
 because it is consistent across clusters without external network configuration.
 
@@ -31,10 +31,13 @@ and while looking we will instead document the options.
 
 ## Name resolution
 
+Methods to meet the above requirement include, but are not limited to:
+
  1. Use Ingress to get a registry URL
     - All Knative clusters have Ingress support.
     - It's safe to assume these days that Ingress manages SSL certificates.
     - Drawback: Image URLs in Knative end user manifests all embed the current hostname.
+    - Warning: Your registry must do authentication before you create an Ingress resource for it.
  2. Use a local DNS that both your nodes and your containers resolve from.
  3. Edit nodes' /etc/hosts to resolve an in-cluster service name, and expose a host port.
 
@@ -51,8 +54,8 @@ Kaniko has `--insecure` and `--skip-tls-verify` flags that you could add to your
 The Knative Serving controller, however, exposes no such options.
 You can [disable tag-to-digest resolving](https://github.com/knative/serving/blob/v0.1.1/config/config-controller.yaml#L31)
 and thus not need to worry about registry access there at all,
-but you'll lose support for an important part of the
-[Configuration](https://github.com/knative/serving/blob/master/docs/spec/spec.md#configuration) magic.
+but you'll lose support for an important part of the automatic
+[Revision](https://github.com/knative/docs/tree/master/serving#serving-resources) support.
 
 Ideally we'd like to avoid [Docker daemon config](https://docs.docker.com/registry/insecure/) and custom flags to build steps,
 and the potential security holes of skipping TLS validation.
