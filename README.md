@@ -104,6 +104,27 @@ spec:
 "
 ```
 
+## Use a service account for Build
+
+It's [recommended](https://github.com/knative/docs/blob/master/build/auth.md#basic-authentication-docker)
+to set a `serviceAccountName:` in Build resources if your registry requires authentication.
+
+To let manifests support both authenticated and local registries we assume that
+a dummy `knative-build` service account exists when authentication is not required.
+
+```bash
+cat <<EOF | kubectl create -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: knative-build
+secrets: []
+EOF
+```
+
+An alternative would be to patch the `default` ServiceAccount in namespaces that build,
+as is recommended for [nodes' pull authentication](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-imagepullsecrets-to-a-service-account).
+
 ## Persistence
 
 This repository is mainly concerned with registry access.
