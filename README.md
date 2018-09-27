@@ -57,23 +57,13 @@ but you'll lose support for an important part of the
 Ideally we'd like to avoid [Docker daemon config](https://docs.docker.com/registry/insecure/) and custom flags to build steps,
 and the potential security holes of skipping TLS validation.
 
-### Accepting a cluster cert during build
+### Accepting a cluster-generated cert during build
 
 With registry TLS certificates generated according to
 https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/
-you need to do the following in your kaniko build steps:
+you need to make sure the cluster CA is trusted where required in Knative.
 
-```
-ln -s /var/run/secrets/kubernetes.io/serviceaccount/ca.crt /kaniko/ssl/certs/ca.crt
-```
-
-Kaniko will pick it up alongside its default /kaniko/ssl/certs/ca-certificates.crt and accept your registry TLS.
-It could be a volumeMount instead of a shell command.
-For the Knative step that looks up image digest we might be able to do the same mount.
-
-### Patching the Knative controller
-
-Knative will look up image digests in order to produce revisions.
+Serving's "tag to digest" feature will look up image digests in order to produce revisions.
 The controller (soon to be named reconciler) needs access to the image registry to do that.
 
 Pending discussions within the Knative community on how to do this we patch the controller's deployment.
@@ -103,6 +93,34 @@ spec:
           secretName: $DEFAULT_TOKEN_NAME
 "
 ```
+
+Similarly we can patch any Kaniko build steps that push to the registry,
+or pulls any of your local images as [FROM](https://docs.docker.com/engine/reference/builder/#from).
+For example, assuming the build step name that pushes is `export`,
+as in the [nodejs-runtime](https://github.com/triggermesh/nodejs-runtime) template:
+
+```bash
+NAMESPACE=default
+DEFAULT_TOKEN_NAME=$(kubectl -n $NAMESPACE get secret -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep default-token-)
+BUILD_TEMPLATE_NAME=runtime-nodejs
+kubectl -n $NAMESPACE patch buildtemplate.build.knative.dev/$BUILD_TEMPLATE_NAME -p $"
+spec:
+  steps:
+  - name: export
+    volumeMounts:
+    - name: default-token
+      mountPath: /kaniko/ssl/certs/ca.crt
+      subPath: ca.crt
+  volumes:
+  - name: default-token
+    secret:
+      defaultMode: 420
+      secretName: $DEFAULT_TOKEN_NAME
+"
+```
+
+A symlink `ln -s /var/run/secrets/kubernetes.io/serviceaccount/ca.crt /kaniko/ssl/certs/ca.crt`
+so alternatively you could use an image built from `gcr.io/kaniko-project/executor`.
 
 ## Use a service account for Build
 
