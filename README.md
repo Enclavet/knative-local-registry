@@ -132,8 +132,25 @@ kubectl -n $NAMESPACE patch buildtemplate.build.knative.dev/$BUILD_TEMPLATE_NAME
   }]"
 ```
 
+If you'd rather modify the source (but note that the token name is per namespace):
+
+```diff
+      image: gcr.io/kaniko-project/executor
+      args:
+      - --destination=${_IMAGE}:${TAG}
++     volumeMounts:
++     - name: default-token
++       mountPath: /kaniko/ssl/certs/ca.crt
++       subPath: ca.crt
++   volumes:
++   - name: default-token
++     secret:
++       defaultMode: 420
++       secretName: default-token-XXXXX
+```
+
 A symlink `ln -s /var/run/secrets/kubernetes.io/serviceaccount/ca.crt /kaniko/ssl/certs/ca.crt`
-so alternatively you could use an image built from `gcr.io/kaniko-project/executor`.
+works too, so alternatively you could use an image built from `gcr.io/kaniko-project/executor`.
 
 ## Use a service account for Build
 
