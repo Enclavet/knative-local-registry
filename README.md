@@ -191,3 +191,7 @@ Self-hosting is achievable with [Minio](https://minio.io/) and the [s3](https://
 
 A compelling advantage with S3 or GCS bucket stores is that you can reuse the same bucket across clusters,
 getting access to the same images everywhere.
+
+## On minikube
+
+Run `minikube ssh` followed by `echo "127.0.0.1 knative-local-registry" | sudo tee -a /etc/hosts`.
