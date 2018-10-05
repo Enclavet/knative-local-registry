@@ -11,7 +11,7 @@ spec:
       serviceAccount: cert-mgmt
       containers:
       - name: bash
-        image: solsson/kubectl-cfssl@sha256:ef611e1ddb4126a3377a075f2e91986950a30e01d837d0a7f8d96de031c230d7
+        image: solsson/kubectl-cfssl@sha256:bbfa272226b8d04fdbb2caeb724c115052d8ee2f9a1c1d5dc663e3d95aa4a146
         command:
         - /bin/bash
         args:
