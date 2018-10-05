@@ -15,7 +15,7 @@ spec:
         command:
         - /bin/bash
         args:
-        - -cex
+        - -ce
         - |
           kubectl get secret registry-tls -o wide --ignore-not-found=true
           kubectl get csr registry-tls -o wide --ignore-not-found=true
@@ -53,7 +53,7 @@ spec:
           kubectl get csr registry-tls -o wide
 
           until [ "$(kubectl get csr registry-tls -o jsonpath='{.status.conditions[0].type}')" == 'Approved' ]; do
-            echo "\n"
+            echo ""
             echo "Waiting for someone/somebot to run:"
             echo "kubectl certificate approve registry-tls"
             sleep 10
