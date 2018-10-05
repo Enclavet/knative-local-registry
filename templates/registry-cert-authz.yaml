@@ -1,4 +1,3 @@
-# This RBAC isn't doing its thing
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -11,19 +10,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: cert-requester-for-registry
 rules:
-- apiGroups: ["certificates.k8s.io"]
-  resources: ["certificatesigningrequests"]
-  resourceNames: ["private.registry", "registry-tls"]
-  verbs: ["get", "create"]
-- apiGroups: ["certificates.k8s.io"]
-  resources: ["certificatesigningrequests/registry-tls"]
-  verbs: ["get", "create"]
-- apiGroups: ["certificates.k8s.io"]
-  resources: ["certificatesigningrequests"]
-  verbs: ["get", "create"]
-- apiGroups: [""]
-  resources: ["certificatesigningrequests.certificates.k8s.io"]
-  verbs: ["get", "create"]
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - get
+  - create
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
