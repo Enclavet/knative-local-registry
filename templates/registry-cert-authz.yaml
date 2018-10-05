@@ -1,3 +1,4 @@
+# This RBAC isn't doing its thing
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -12,7 +13,17 @@ metadata:
 rules:
 - apiGroups: ["certificates.k8s.io"]
   resources: ["certificatesigningrequests"]
-  verbs: ["create"]
+  resourceNames: ["private.registry", "registry-tls"]
+  verbs: ["get", "create"]
+- apiGroups: ["certificates.k8s.io"]
+  resources: ["certificatesigningrequests/registry-tls"]
+  verbs: ["get", "create"]
+- apiGroups: ["certificates.k8s.io"]
+  resources: ["certificatesigningrequests"]
+  verbs: ["get", "create"]
+- apiGroups: [""]
+  resources: ["certificatesigningrequests.certificates.k8s.io"]
+  verbs: ["get", "create"]
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -25,18 +36,27 @@ rules:
   resourceNames: ["registry-tls"]
   verbs: ["update", "get"]
 ---
-kind: RoleBinding
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: cert-request
   namespace: registry
 subjects:
-- kind: ServiceAccount
-  name: cert-mgmt
+- kind: User
+  name: registry:cert-mgmt
 roleRef:
   kind: ClusterRole
   name: cert-requester-for-registry
   apiGroup: rbac.authorization.k8s.io
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cert-secret-update
+  namespace: registry
+subjects:
+- kind: User
+  name: cert-mgmt
 roleRef:
   kind: Role
   name: cert-secret-updater
