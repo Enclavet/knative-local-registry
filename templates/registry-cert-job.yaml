@@ -11,13 +11,15 @@ spec:
       serviceAccount: cert-mgmt
       containers:
       - name: bash
-        image: solsson/kubectl-cfssl@sha256:bbfa272226b8d04fdbb2caeb724c115052d8ee2f9a1c1d5dc663e3d95aa4a146
-        imagePullPolicy: Never
+        image: solsson/kubectl-cfssl@sha256:ef611e1ddb4126a3377a075f2e91986950a30e01d837d0a7f8d96de031c230d7
         command:
-        - /bin/sh
+        - /bin/bash
         args:
-        - -c
+        - -cex
         - |
+          kubectl get secret registry-tls -o wide --ignore-not-found=true
+          kubectl get csr registry-tls -o wide --ignore-not-found=true
+
           cat <<EOF | cfssl genkey - | cfssljson -bare server
           {
             "hosts": [
@@ -33,7 +35,7 @@ spec:
           }
           EOF
 
-          cat <<EOF | tee server-csr.yaml | kubectl create -f - || cat server-csr.yaml
+          cat <<EOF | kubectl create -f -
           apiVersion: certificates.k8s.io/v1beta1
           kind: CertificateSigningRequest
           metadata:
@@ -48,19 +50,18 @@ spec:
             - server auth
           EOF
           
-          kubectl describe csr registry-tls || echo "\nFailed to create csr (RBAC issue probably)\n"
+          kubectl get csr registry-tls -o wide
 
-          while ! $(kubectl get csr registry-tls); do
+          until [ "$(kubectl get csr registry-tls -o jsonpath='{.status.conditions[0].type}')" == 'Approved' ]; do
             echo "\n"
             echo "Waiting for someone/somebot to run:"
-            echo "  kubectl certificate approve registry-tls"
-            echo "\n"
+            echo "kubectl certificate approve registry-tls"
             sleep 10
           done
 
           kubectl get csr registry-tls -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
 
-          cat <<EOF | tee registry-tls-secret.yaml | kubectl create -f - || cat registry-tls-secret.yaml
+          cat <<EOF | kubectl apply -f -
           apiVersion: v1
           kind: Secret
           type: Opaque

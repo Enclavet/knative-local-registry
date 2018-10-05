@@ -31,10 +31,15 @@ metadata:
   namespace: registry
   name: cert-secret-updater
 rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  resourceNames: ["registry-tls"]
-  verbs: ["update", "get"]
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+  - update
+  - patch
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -42,8 +47,9 @@ metadata:
   name: cert-request
   namespace: registry
 subjects:
-- kind: User
-  name: registry:cert-mgmt
+- kind: ServiceAccount
+  name: cert-mgmt
+  namespace: registry
 roleRef:
   kind: ClusterRole
   name: cert-requester-for-registry
@@ -55,8 +61,9 @@ metadata:
   name: cert-secret-update
   namespace: registry
 subjects:
-- kind: User
+- kind: ServiceAccount
   name: cert-mgmt
+  namespace: registry
 roleRef:
   kind: Role
   name: cert-secret-updater
