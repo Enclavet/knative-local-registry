@@ -52,6 +52,8 @@ spec:
           
           kubectl get csr registry-tls -o wide
 
+          #kubectl certificate approve registry-tls || "Failed to self-approve certificate, presumably because of RBAC"
+
           until [ "$(kubectl get csr registry-tls -o jsonpath='{.status.conditions[0].type}')" == 'Approved' ]; do
             echo ""
             echo "Waiting for someone/somebot to run:"
