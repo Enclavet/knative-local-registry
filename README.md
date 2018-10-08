@@ -95,6 +95,7 @@ spec:
           defaultMode: 420
           secretName: $DEFAULT_TOKEN_NAME
 "
+kubectl -n knative-serving get pods -w
 ```
 
 Similarly we can patch any Kaniko build steps that push to the registry,
