@@ -193,6 +193,18 @@ Self-hosting is achievable with [Minio](https://minio.io/) and the [s3](https://
 A compelling advantage with S3 or GCS bucket stores is that you can reuse the same bucket across clusters,
 getting access to the same images everywhere.
 
-## On minikube
+## The `knative-local-registry` name
+
+We chose a name without a TLD so it can't be resolvable on public Internet.
+
+Apply [./templates/registry-alias-in-each-namespace.yaml](./templates/registry-alias-in-each-namespace.yaml) in all namespaces where you want this resolvable.
+
+With CoreDNS (Kubernetes 1.11) make sure you run a version that has https://github.com/coredns/coredns/pull/2040:
+
+```
+k-kube-system set image deploy/coredns coredns=k8s.gcr.io/coredns:1.2.2
+```
+
+### On minikube
 
 Run `minikube ssh` followed by `echo "127.0.0.1 knative-local-registry" | sudo tee -a /etc/hosts`.
