@@ -9,6 +9,17 @@ data:
         worker_connections  10;
     }
 
+    stream {
+      upstream docker-registry-tls {
+        server unauthenticated:443;
+      }
+
+      server {
+        listen 443;
+        proxy_pass docker-registry-tls;
+      }
+    }
+
     http {
 
       upstream docker-registry {
