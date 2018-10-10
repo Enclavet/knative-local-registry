@@ -15,7 +15,7 @@ because only a sidecar would be reachable at localhost and sidecars don't run wh
 
 ## Requirements for a local registry endpoint
 
-As [ICP](https://medium.com/@zhimin.wen/explore-knative-build-on-on-premise-kubernetes-cluster-ibm-cloud-private-b0e94e59ba9d) pioneered,
+As [ICP](https://medium.com/@zhimin.wen/explore-knative-build-on-on-premise-kubernetes-cluster-ibm-cloud-private-b0e94e59ba9d) showed,
 the essential requirement for a local registry is that "The hostname of the private registry is resolvable".
 The same hostname and optional :port must work from both nodes' docker daemon and inside the cluster,
 but not necessarily from anywhere else.
@@ -95,6 +95,7 @@ spec:
           defaultMode: 420
           secretName: $DEFAULT_TOKEN_NAME
 "
+kubectl -n knative-serving get pods -w
 ```
 
 Similarly we can patch any Kaniko build steps that push to the registry,
@@ -191,3 +192,21 @@ Self-hosting is achievable with [Minio](https://minio.io/) and the [s3](https://
 
 A compelling advantage with S3 or GCS bucket stores is that you can reuse the same bucket across clusters,
 getting access to the same images everywhere.
+
+## The `knative-local-registry` name
+
+We chose a name without a TLD so it can't be resolvable on public Internet.
+
+Apply [./templates/registry-alias-in-each-namespace.yaml](./templates/registry-alias-in-each-namespace.yaml) in all namespaces where you want this resolvable.
+
+With CoreDNS (Kubernetes 1.11) make sure you run a version that has https://github.com/coredns/coredns/pull/2040:
+
+```
+kubectl -n kube-system set image deploy/coredns coredns=k8s.gcr.io/coredns:1.2.2
+```
+
+... but this appears to be fixed already in Minikube 0.30.
+
+### On minikube
+
+Run `minikube ssh` followed by `echo "127.0.0.1 knative-local-registry" | sudo tee -a /etc/hosts`.

@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: registry
+  namespace: registry
+  labels:
+    app: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: podip-to-dns
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        image: busybox@sha256:cb63aa0641a885f54de20f61d152187419e8f6b159ed11a251a09d115fdff9bd
+        command:
+        - /bin/sh
+        args:
+        - -c
+        # Registry access could probably be consistent between knative and k8s using https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips
+        - |
+          echo "podIP is $POD_IP";
+          echo "How do we publish this to a DNS used by both nodes' docker and in-cluster?";
+          tail -f /dev/null;
+      - name: docker-v2
+        image: registry:2.6.2@sha256:672d519d7fd7bbc7a448d17956ebeefe225d5eb27509d8dc5ce67ecb4a0bce54
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+          name: registry
+          protocol: TCP
+        env:
+        - name: REGISTRY_HTTP_SECRET
+          value: TODO_GET_FROM_SECRET
+        - name: REGISTRY_HTTP_ADDR
+          value: 0.0.0.0:80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+        volumeMounts:
+        - name: etc-registry
+          mountPath: /etc/docker/registry
+        - name: storage-temporary
+          mountPath: /var/lib/registry
+      - name: docker-v2-tls
+        image: registry:2.6.2@sha256:672d519d7fd7bbc7a448d17956ebeefe225d5eb27509d8dc5ce67ecb4a0bce54
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 443
+          name: registry
+          protocol: TCP
+        env:
+        - name: REGISTRY_HTTP_SECRET
+          value: hibHJByyPcMXppjgVY2mJVBMGVBDbk
+        - name: REGISTRY_HTTP_ADDR
+          value: 0.0.0.0:443
+        - name: REGISTRY_HTTP_TLS_CERTIFICATE
+          value: /certs/tls.crt
+        - name: REGISTRY_HTTP_TLS_KEY
+          value: /certs/tls.key
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 443
+            scheme: HTTPS
+        volumeMounts:
+        - name: etc-registry
+          mountPath: /etc/docker/registry
+        - name: certs
+          mountPath: /certs
+        - name: storage-temporary
+          mountPath: /var/lib/registry
+      volumes:
+      - name: etc-registry
+        configMap:
+          name: registry-config
+      - name: certs
+        secret:
+          secretName: registry-tls
+      - name: storage-temporary
+        emptyDir: {}

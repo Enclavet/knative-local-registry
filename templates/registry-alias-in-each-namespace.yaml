@@ -1,0 +1,7 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: knative-local-registry
+spec:
+  type: ExternalName
+  externalName: unauthenticated.registry.svc.cluster.local

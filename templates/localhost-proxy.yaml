@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: localhost-proxy
+  namespace: registry
+  labels:
+    app: localhost-proxy
+spec:
+  selector:
+    matchLabels:
+      app: localhost-proxy
+  template:
+    metadata:
+      labels:
+        app: localhost-proxy
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.15.5@sha256:9ad0746d8f2ea6df3a17ba89eca40b48c47066dfab55a75e08e2b70fc80d929e
+        ports:
+        - containerPort: 5000
+          # On GKE with DaemonSet this enables pull from 127.0.0.1:5000 but not from localhost
+          hostPort: 5000
+        volumeMounts:
+        - name: etc-nginx
+          subPath: nginx.conf
+          mountPath: /etc/nginx/nginx.conf
+      volumes:
+      - name: etc-nginx
+        configMap:
+          name: localhost-proxy
