@@ -200,3 +200,6 @@ kubectl -n kube-system set image deploy/coredns coredns=k8s.gcr.io/coredns:1.2.2
 ### On minikube
 
 Run `minikube ssh` followed by `echo "127.0.0.1 knative-local-registry" | sudo tee -a /etc/hosts`.
+
+You might also want `echo '127.0.0.1 unauthenticated.registry.svc.cluster.local' | sudo tee -a /etc/hosts`.
+See https://github.com/triggermesh/go-containerregistry/tree/registry-allow-port for why.
