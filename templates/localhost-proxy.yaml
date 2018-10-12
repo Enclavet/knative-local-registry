@@ -21,6 +21,10 @@ spec:
         - containerPort: 5000
           # On GKE with DaemonSet this enables pull from 127.0.0.1:5000 but not from localhost
           hostPort: 5000
+        - containerPort: 80
+          hostPort: 80
+        - containerPort: 443
+          hostPort: 443
         volumeMounts:
         - name: etc-nginx
           subPath: nginx.conf
