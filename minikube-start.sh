@@ -27,3 +27,13 @@ echo "Updating resolv.conf ..."
 # Is there a way to rsh with minikube ssh?
 ssh -i $(minikube ssh-key) -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no docker@$(minikube ip) \
   "sudo sed -i 's/^nameserver/nameserver $DNS_IP\nnameserver/' /etc/resolv.conf"
+
+### Would you like to install Knative using github.com/triggermesh/charts?
+kubectl cluster-info
+# TODO can we run this in k8s instead, to avoid dependence on local Helm?
+#helm init
+#helm repo add tm https://storage.googleapis.com/triggermesh-charts
+#helm repo update
+#helm search knative
+#helm install tm/knative
+#kubectl get pods --all-namespaces -w
