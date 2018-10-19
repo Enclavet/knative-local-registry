@@ -10,4 +10,5 @@ minikube version | grep v0.28 && echo "You might need extra args for <0.29 minik
 minikube start --memory=8192 --cpus=4 \
   --kubernetes-version=v1.11.3 \
   --vm-driver=hyperkit \
-  --bootstrapper=kubeadm
+  --bootstrapper=kubeadm \
+  --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
