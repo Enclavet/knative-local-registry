@@ -18,7 +18,7 @@ metadata:
   name: knative
   namespace: registry
   labels:
-    authenticated: no
+    authenticated: "false"
 spec:
   selector:
     app: registry
