@@ -12,3 +12,13 @@ minikube start --memory=8192 --cpus=4 \
   --vm-driver=hyperkit \
   --bootstrapper=kubeadm \
   --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
+
+# --insecure-registry 10.0.0.0/24 should not be needed because according to docs "The default service CIDR range will automatically be added"
+
+# Insecure registry used because we can't
+
+# DNS mignt not be listed as enabled, but the service is available anyway
+minikube addons list | grep -E "coredns|kube-dns"
+
+echo "Updating minikube DNS resolution, see github.com/kubernetes/minikube/issues/2162"
+kubectl get svc kube-dns -n kube-system

@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Deprecated, see README
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
-  name: knative-local-registry
+  name: knative
+  namespace: registry
+  labels:
+    authenticated: no
 spec:
-  type: ExternalName
-  externalName: unauthenticated.registry.svc.cluster.local
+  selector:
+    app: registry
+  ports:
+  - name: http
+    port: 80
+  - name: https
+    port: 443
