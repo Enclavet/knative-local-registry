@@ -1,5 +1,14 @@
 # Local container registry for Knative
 
+TL;DR:
+
+ * It's convenient to have a local Docker registry.
+ * Knative won't work with typical such Kubernetes addons.
+ * This repository has a tested setup.
+ * Prefer TLS validation over `--insecure-registry`, for security.
+
+## Why local
+
 With a local Docker registry, Knative can be portable between private and public clouds.
 
 You might also get faster builds, avoiding round trips over public network.
@@ -59,7 +68,12 @@ Instead clients use https for anything that's not 127.0.0.1 or localhost.
 SSL requires a TLS certificate that can be validated by all your registry clients.
 
 Kaniko has `--insecure` and `--skip-tls-verify` flags that you could add to your build templates.
-The Knative Serving controller, however, exposes no such options.
+Note however that they [recommend against](https://github.com/GoogleContainerTools/kaniko#--skip-tls-verify)
+using it for production.
+Lacking CIDR range support it will affect public registry access too
+(such as `FROM docker.io/...`) which opens up a security vulnerability.
+
+The Knative Serving controller, however, exposes no insecure options.
 You can [disable tag-to-digest resolving](https://github.com/knative/serving/blob/v0.1.1/config/config-controller.yaml#L31)
 and thus not need to worry about registry access there at all,
 but you'll lose support for an important part of the automatic
