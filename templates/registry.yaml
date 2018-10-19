@@ -42,7 +42,6 @@ spec:
         - /bin/sh
         args:
         - -c
-        # Registry access could probably be consistent between knative and k8s using https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips
         - |
           echo "podIP is $POD_IP";
           echo "How do we publish this to a DNS used by both nodes' docker and in-cluster?";
