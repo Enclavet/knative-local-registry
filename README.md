@@ -4,7 +4,7 @@ TL;DR:
 
  * It's convenient to have a local Docker registry.
  * Knative won't work with typical such Kubernetes addons.
- * This repository has a tested setup.
+ * This repository installs a registry accessible at `knative.registry.svc.cluster.local`.
  * Prefer TLS validation over `--insecure-registry`, for security.
 
 ## Why local
