@@ -5,6 +5,9 @@ It could also provide faster builds, avoiding round trips over public network.
 There's also the potential to hide image URLs,
 as an implementation detail, for Source-to-URL workflows.
 
+A local cluster also tends to speed up testing, e2e `go test` etc,
+when developing services on top of Knative.
+
 ## How does this repo differ from other registry setups?
 
 Most guides on using a local (sometimes called private, which sometimes means authenticated)
