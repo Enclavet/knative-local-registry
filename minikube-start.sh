@@ -24,9 +24,18 @@ DNS_IP=$(kubectl get svc kube-dns -n kube-system -o jsonpath='{.spec.clusterIP}'
 echo "kube-dns IP is $DNS_IP"
 
 echo "Updating resolv.conf ..."
-# Is there a way to rsh with minikube ssh?
+# Commented out the resolv.conf change because of presumable side effects as it's propagated to k8s
+#ssh -i $(minikube ssh-key) -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no docker@$(minikube ip) \
+#  "sudo sed -i 's/^nameserver/nameserver $DNS_IP\nnameserver/' /etc/resolv.conf"
+# Someone who knows DNS and/or minikube, can we resolve all .local using k8s elegantly?
+# https://forums.docker.com/t/docker-pull-not-using-correct-dns-server-when-private-registry-on-vpn/11117/11
+# https://github.com/kubernetes/minikube/issues/1165
+# For now simply adding the known service name to /etc/hosts
+kubectl create namespace registry
+kubectl apply -f templates/registry-service-knative.yaml
+REGISTRY_IP=$(kubectl get svc knative -n registry -o jsonpath='{.spec.clusterIP}')
 ssh -i $(minikube ssh-key) -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no docker@$(minikube ip) \
-  "sudo sed -i 's/^nameserver/nameserver $DNS_IP\nnameserver/' /etc/resolv.conf"
+  "echo '$REGISTRY_IP knative.registry.svc.cluster.local' | sudo tee -a /etc/hosts"
 
 ### Would you like to install Knative using github.com/triggermesh/charts?
 kubectl cluster-info
