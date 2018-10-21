@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# To apply this before the repo is helmified:
+# cat templates/registry-service-nodeport.yaml | sed 's/{{/#{{/' | kubectl apply -f -
 {{if .nodePort}}
 apiVersion: v1
 kind: Service
@@ -24,8 +26,8 @@ spec:
   selector:
     app: registry
   ports:
-  - name: https
-    port: 443
+  - name: http
+    port: 80
     nodePort: 30500
   type: NodePort
 {{end}}
