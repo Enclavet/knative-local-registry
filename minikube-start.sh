@@ -23,7 +23,7 @@ kubectl get svc kube-dns -n kube-system
 DNS_IP=$(kubectl get svc kube-dns -n kube-system -o jsonpath='{.spec.clusterIP}')
 echo "kube-dns IP is $DNS_IP"
 
-echo "Updating resolv.conf ..."
+echo "Updating name resolution ..."
 # Commented out the resolv.conf change because of presumable side effects as it's propagated to k8s
 #ssh -i $(minikube ssh-key) -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no docker@$(minikube ip) \
 #  "sudo sed -i 's/^nameserver/nameserver $DNS_IP\nnameserver/' /etc/resolv.conf"
@@ -36,6 +36,15 @@ kubectl apply -f templates/registry-service-knative.yaml
 REGISTRY_IP=$(kubectl get svc knative -n registry -o jsonpath='{.spec.clusterIP}')
 ssh -i $(minikube ssh-key) -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no docker@$(minikube ip) \
   "echo '$REGISTRY_IP knative.registry.svc.cluster.local' | sudo tee -a /etc/hosts"
+
+kubectl apply -f templates/registry-cert-job.yaml
+until kubectl certificate approve registry-tls 2>/dev/null;
+do
+  echo "Waiting for registry cert job to request a certificate ..."
+done
+
+echo "Starting registry ..."
+kubectl apply -f templates/
 
 ### Would you like to install Knative using github.com/triggermesh/charts?
 kubectl cluster-info
