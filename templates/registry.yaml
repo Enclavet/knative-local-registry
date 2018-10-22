@@ -54,7 +54,7 @@ spec:
             memory: 16Mi
           limits:
             cpu: 100m
-            memory: 100Mi
+            memory: 200Mi
         ports:
         - containerPort: 80
           name: registry
@@ -82,7 +82,7 @@ spec:
             memory: 16Mi
           limits:
             cpu: 100m
-            memory: 100Mi
+            memory: 200Mi
         ports:
         - containerPort: 443
           name: registry
