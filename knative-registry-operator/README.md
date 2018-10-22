@@ -1,5 +1,7 @@
 # Automated support for local registry
 
+_Note: With https://github.com/triggermesh/knative-local-registry/pull/4 it looks like we don't need the patching anymore._
+
 ## Accepting a cluster-generated cert during build
 
 With registry TLS certificates generated according to
