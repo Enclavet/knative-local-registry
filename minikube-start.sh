@@ -42,7 +42,7 @@ kubectl apply -f templates/registry-cert-job.yaml
 until kubectl certificate approve registry-tls 2>/dev/null;
 do
   echo "Waiting for registry cert job to request a certificate ..."
-  sleep 1
+  sleep 3
 done
 
 echo "Starting registry ..."
