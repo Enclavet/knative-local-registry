@@ -32,7 +32,8 @@ See [development](./DEVELOPMENT.md) for more details.
 ## Persistence
 
 Note that this setup uses transient registry storage.
-See [development](./DEVELOPMENT.md) for options on how to make it persistent.
+See [Registry docs](https://docs.docker.com/registry/deploying/#storage-customization) for options on how to make it persistent,
+and modify [config](./templates/registry-config.yaml) and/or [volume(s)](./templates/registry.yaml) accordingly.
 
 ## Support
 
