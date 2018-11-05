@@ -36,6 +36,9 @@ kubectl apply -f templates/registry-service-knative.yaml
 REGISTRY_IP=$(kubectl get svc knative -n registry -o jsonpath='{.spec.clusterIP}')
 ssh -i $(minikube ssh-key) -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no docker@$(minikube ip) \
   "echo '$REGISTRY_IP knative.registry.svc.cluster.local' | sudo tee -a /etc/hosts"
+# Pending https://github.com/triggermesh/tm/issues/31
+ssh -i $(minikube ssh-key) -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no docker@$(minikube ip) \
+  "echo '$REGISTRY_IP unauthenticated.registry.svc.cluster.local' | sudo tee -a /etc/hosts"
 
 kubectl apply -f templates/registry-cert-authz.yaml
 kubectl apply -f templates/registry-cert-job.yaml
