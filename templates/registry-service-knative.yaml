@@ -12,9 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# To be updated actual credentials if registry requires auth
 apiVersion: v1
-kind: ServiceAccount
+kind: Service
 metadata:
-  name: knative-build
-secrets: []
+  name: knative
+  namespace: registry
+  labels:
+    authenticated: "false"
+spec:
+  selector:
+    app: registry
+  ports:
+  - name: http
+    port: 80
+  - name: https
+    port: 443

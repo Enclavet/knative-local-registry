@@ -39,7 +39,8 @@ spec:
             "hosts": [
               "unauthenticated.registry.svc.cluster.local",
               "authenticated.registry.svc.cluster.local",
-              "knative-local-registry"
+              "knative-local-registry",
+              "knative.registry.svc.cluster.local"
             ],
             "CN": "registry.svc.cluster.local",
             "key": {
