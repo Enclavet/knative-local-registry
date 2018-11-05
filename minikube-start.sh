@@ -9,7 +9,7 @@ set -e
 minikube version | grep v0.28 && echo "You might need extra args for <0.29 minikube, see https://github.com/istio/istio.io/pull/2708"
 
 minikube start --memory=8192 --cpus=4 \
-  --kubernetes-version=v1.11.3 \
+  --kubernetes-version=v1.11.4 \
   --vm-driver=hyperkit \
   --bootstrapper=kubeadm \
   --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
