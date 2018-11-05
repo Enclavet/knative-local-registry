@@ -31,7 +31,7 @@ See [development](./DEVELOPMENT.md) for more details.
 
 ## Persistence
 
-Note that this setup uses trancient registry storage.
+Note that this setup uses transient registry storage.
 See [development](./DEVELOPMENT.md) for options on how to make it persistent.
 
 ## Support
