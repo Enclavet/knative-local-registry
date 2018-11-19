@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: registry-etc-hosts-update
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: registry-etc-hosts-update
+  template:
+    metadata:
+      labels:
+        app: registry-etc-hosts-update
+    spec:
+      containers:
+      - name: update
+        image: debian:stretch-slim
+        volumeMounts:
+        - name: etchosts
+          mountPath: /host-etc/hosts
+        env:
+        - name: REGISTRY_SERVICE_HOST
+          value: knative.registry.svc.cluster.local
+        command:
+        - bash
+        - -cex
+        - |
+          grep "$REGISTRY_SERVICE_HOST" /host-etc/hosts || getent hosts "$REGISTRY_SERVICE_HOST" >> /host-etc/hosts;
+          tail -f /dev/null;
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: etchosts
+        hostPath:
+          path: /etc/hosts
