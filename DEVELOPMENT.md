@@ -7,6 +7,8 @@ TL;DR:
  * This repository installs a registry accessible at `knative.registry.svc.cluster.local`.
  * Prefer TLS validation over `--insecure-registry`, for security.
 
+There's a branch https://github.com/triggermesh/knative-local-registry/tree/tls-with-cluster-ca that experiments with registry TLS using the cluster CA.
+
 ## Why local
 
 With a local Docker registry, Knative can be portable between private and public clouds.
