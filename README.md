@@ -1,17 +1,19 @@
 # Local Kubernetes registry for Knative
 
-Knative documents how to use Build with cloud-based registries and authentication,
-but you can benefit from a local registry in a couple of ways:
+A _local_ registry lets you use the same image URLs in all clusters,
+in-container (Kaniko builds, Knative tag-to-digest resolver etc.) as well as on nodes (dockerd image pull).
+Local registry with temporary storage eliminate a security concern and bandwidth cost of playing around with Knative.
+Local registry with persistence to bucket store let multiple clusters share images.
+If desired, any one of them can be your production registry.
 
- * Use a disposable registry when experimenting with Knative.
- * Faster & offline Knative builds.
- * No need to set up service accounts.
- * For Source-to-URL workflows hide registry details from users.
+The question is: How do we chose the hostname for our image URLs?
+Running a [Registry](https://hub.docker.com/_/registry/) locally is easy, but:
 
-There are quite a few registry setups for Kubernetes,
-but we haven't found any that works with Knative.
-In-container builds and the tag-to-digest resolution of the Serving reconciler
-require the same registry URL to be valid for both build and pull.
+ * We can't use a real SSL certificate issuer.
+ * Docker on k8s nodes typically fails to resolve cluster names.
+
+Knative doesn't (yet?) abstract out the registry URL from Source-to-URL workflows,
+so we need the same user-facing FQDNs to work both with Knative and nodes' Docker.
 
 ## Set up name resolution
 
