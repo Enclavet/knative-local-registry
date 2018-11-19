@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: docker-pull
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: docker
+        image: docker@sha256:201c31cae6daa97001fe9c0cd2e2d3a157ca6447aaa74b070189790445627511
+        command:
+        - sh
+        - -ce
+        - |
+          docker pull knative.registry.svc.cluster.local/registrytest/kanikopush:latest
+        volumeMounts:
+          - name: dockersock
+            mountPath: "/var/run/docker.sock"
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock

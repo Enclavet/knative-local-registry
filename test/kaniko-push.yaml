@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: registry-test-kaniko-push
+spec:
+  template:
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug@sha256:1b96ff24d5257e8ace559d4625c80a01f17671d8aa087ee175a6e2aabe02d042
+        command:
+        - /busybox/sh
+        - -ce
+        - |
+          date > ./timestamp;
+          echo "FROM scratch" > Dockerfile;
+          echo "COPY timestamp" >> /timestamp;
+          /kaniko/executor --destination=knative.registry.svc.cluster.local/registrytest/kanikopush:latest
+      restartPolicy: Never
+  backoffLimit: 4
