@@ -31,11 +31,13 @@ minikube start --memory=8192 --cpus=4 \
 # --insecure-registry 10.0.0.0/24 should not be needed because according to docs "The default service CIDR range will automatically be added"
 
 # We know we need this on minikube. For real clusters check first if docker pull already works.
-echo "Enable /etc/hosts update ..."
-kubectl apply -f sysadmin/
 
 echo "Starting registry ..."
+kubectl create namespace registry
 kubectl apply -f templates/
+
+echo "Enable /etc/hosts update ..."
+kubectl apply -f sysadmin/
 
 ### Would you like to install Knative using github.com/triggermesh/charts?
 kubectl cluster-info
