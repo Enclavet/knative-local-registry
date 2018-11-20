@@ -22,12 +22,11 @@ set -e
 
 minikube version | grep v0.28 && echo "You might need extra args for <0.29 minikube, see https://github.com/istio/istio.io/pull/2708"
 
-minikube start --memory=10240 --cpus=4 \
+minikube start --memory=8192 --cpus=4 \
   --kubernetes-version=v1.11.4 \
   --vm-driver=hyperkit \
   --bootstrapper=kubeadm \
-  --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook" \
-  --extra-config=apiserver.service-node-port-range=80-32767
+  --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
 
 # --insecure-registry 10.0.0.0/24 should not be needed because according to docs "The default service CIDR range will automatically be added"
 
