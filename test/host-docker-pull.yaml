@@ -12,19 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Service
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: unauthenticated
-  namespace: registry
+  name: docker-pull
 spec:
-  selector:
-    app: registry
-  ports:
-  - name: http
-    port: 80
-  - name: https
-    port: 443
-  - name: https-local
-    port: 5000
-    targetPort: 443
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: docker
+        image: docker@sha256:201c31cae6daa97001fe9c0cd2e2d3a157ca6447aaa74b070189790445627511
+        command:
+        - sh
+        - -ce
+        - |
+          docker pull knative.registry.svc.cluster.local/registrytest/kanikopush:latest
+        volumeMounts:
+          - name: dockersock
+            mountPath: "/var/run/docker.sock"
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock

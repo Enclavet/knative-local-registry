@@ -12,16 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Service
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: knative
-  namespace: registry
-  labels:
-    authenticated: "false"
+  name: registry-test-kaniko-push
 spec:
-  selector:
-    app: registry
-  ports:
-  - name: http
-    port: 80
+  template:
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug@sha256:1b96ff24d5257e8ace559d4625c80a01f17671d8aa087ee175a6e2aabe02d042
+        command:
+        - /busybox/sh
+        - -ce
+        - |
+          date > ./timestamp;
+          echo "FROM scratch" > Dockerfile;
+          echo "COPY timestamp" >> /timestamp;
+          /kaniko/executor --destination=knative.registry.svc.cluster.local/registrytest/kanikopush:latest
+      restartPolicy: Never
+  backoffLimit: 4
