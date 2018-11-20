@@ -47,6 +47,17 @@ It's worth pointing out that S3/GCS persistence is particularily useful for loca
 as any other cluster or registry setup that can access the same bucket is automatically a mirror.
 Furthermore it makes horizontal scaling as easy as `kubectl scale` on the registry replicaset.
 
+## Authentication
+
+Beware that this setup grants anyone access.
+See the [Registry docs](https://docs.docker.com/registry/deploying/#restricting-access) for how to enable authentication.
+
+To keep using Knative locally without a [service account](https://github.com/knative/docs/blob/master/build/auth.md#basic-authentication-docker)
+but provide outside access with authentication,
+start a separate Registry deployment backed by the same bucket
+or expose a [proxy](https://docs.docker.com/registry/recipes/nginx/).
+The `nginx:alpine` image can use `htpasswd` files created by [registry](https://docs.docker.com/registry/deploying/#native-basic-auth).
+
 ## Support
 
 We would love your feedback on this project so don't hesitate to let us know what is wrong and how we could improve it, just file an [issue](https://github.com/triggermesh/knative-local-registry/issues/new)
