@@ -25,8 +25,14 @@ minikube version | grep v0.28 && echo "You might need extra args for <0.29 minik
 minikube start --memory=8192 --cpus=4 \
   --kubernetes-version=v1.11.4 \
   --vm-driver=hyperkit \
+  --network-plugin=cni \
+  --container-runtime=containerd \
   --bootstrapper=kubeadm \
   --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
+
+# TODO add [plugins.cri.registry.mirrors."knative.registry.svc.cluster.local"] to /etc/containerd/config.toml
+# pointing to the podIp of the registry pod on the same node (i.e. the one registry pod on minikube)
+# and remove the /etc/hosts record
 
 # --insecure-registry 10.0.0.0/24 should not be needed because according to docs "The default service CIDR range will automatically be added"
 
