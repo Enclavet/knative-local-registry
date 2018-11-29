@@ -33,9 +33,8 @@ spec:
         - name: etchosts
           mountPath: /host-etc/hosts
           readOnly: false
-        # Please create an issue in https://github.com/triggermesh/knative-local-registry if you need this
-        #securityContext:
-        #  privileged: true
+        securityContext:
+          privileged: true
         env:
         - name: REGISTRY_SERVICE_HOST
           value: knative.registry.svc.cluster.local
