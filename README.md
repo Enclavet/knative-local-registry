@@ -31,11 +31,13 @@ There are basically three options:
 
 ## Set up the registry
 
-Use `./minikube-start.sh` or apply the [templates](./templates) folder.
+Apply the [templates](./templates) folder.
+
+There's also a script `./minikube-start.sh` that sets up a Knative-compatible Minikube with local registry.
 
 If docker pull fails, which is likely (you can use our [test](./test) jobs to check),
-you need to work on the name resolution.
-An example of how is in the [sysadmin](./sysadmin) folder.
+you need to fix [name resolution](https://github.com/triggermesh/knative-local-registry#set-up-name-resolution).
+There's a suggestion in the [sysadmin](./sysadmin) folder.
 
 ## Persistence
 
