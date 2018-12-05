@@ -31,21 +31,6 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-      - name: podip-to-dns
-        env:
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
-        image: busybox@sha256:cb63aa0641a885f54de20f61d152187419e8f6b159ed11a251a09d115fdff9bd
-        command:
-        - /bin/sh
-        args:
-        - -c
-        - |
-          echo "podIP is $POD_IP";
-          echo "How do we publish this to a DNS used by both nodes' docker and in-cluster?";
-          tail -f /dev/null;
       - name: docker-v2
         image: registry:2.6.2@sha256:672d519d7fd7bbc7a448d17956ebeefe225d5eb27509d8dc5ce67ecb4a0bce54
         resources:
