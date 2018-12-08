@@ -39,7 +39,8 @@ spec:
             memory: 16Mi
           limits:
             cpu: 100m
-            memory: 200Mi
+            # https://github.com/triggermesh/knative-local-registry/issues/5
+            memory: 300Mi
         ports:
         - containerPort: 80
           name: registry
