@@ -37,7 +37,10 @@ spec:
           privileged: true
         env:
         - name: REGISTRY_SERVICE_HOSTS
-          value: knative.registry.svc.cluster.local builds.registry.svc.cluster.local
+          value: >-
+            knative.registry.svc.cluster.local
+            builds.registry.svc.cluster.local
+            kanikocache.registry.svc.cluster.local
         command:
         - bash
         - -cex
