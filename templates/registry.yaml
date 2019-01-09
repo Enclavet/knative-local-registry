@@ -32,7 +32,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: docker-v2
-        image: registry:2.6.2@sha256:672d519d7fd7bbc7a448d17956ebeefe225d5eb27509d8dc5ce67ecb4a0bce54
+        image: registry:2.7.0@sha256:1cd9409a311350c3072fe510b52046f104416376c126a479cef9a4dfe692cf57
         resources:
           requests:
             cpu: 10m
