@@ -15,7 +15,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: registry-test-kaniko-push
+  name: registry-test-kaniko-push1gb
 spec:
   template:
     spec:
@@ -27,7 +27,7 @@ spec:
         - -ce
         - |
           date > ./timestamp;
-          echo "FROM scratch" > Dockerfile;
+          echo "FROM lambci/lambda@sha256:9f82e54b12a441cdf8dc92f5fc351148e91faa4b2c3b1af7bbf035da50c6f444" > Dockerfile;
           echo "COPY timestamp" >> /timestamp;
           /kaniko/executor --destination=knative.registry.svc.cluster.local/registrytest/kanikopush:latest
       restartPolicy: Never
