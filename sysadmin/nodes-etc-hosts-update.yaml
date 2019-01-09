@@ -33,8 +33,6 @@ spec:
         - name: etchosts
           mountPath: /host-etc/hosts
           readOnly: false
-        securityContext:
-          privileged: true
         env:
         - name: REGISTRY_SERVICE_HOSTS
           value: >-
