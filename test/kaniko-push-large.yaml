@@ -15,20 +15,30 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: registry-test-kaniko-push1gb
+  name: registry-test-kaniko-large
 spec:
   template:
     spec:
       containers:
       - name: kaniko
         image: gcr.io/kaniko-project/executor:debug-v0.7.0@sha256:661f9f2e7555ab1a692d50eb645cbb843f2b0de4fea8eb228c46aef7f89ce5e7
+        env:
+        - name: LAYER_SIZE_MB
+          value: '1500'
+        - name: LAYER_COUNT
+          value: '2'
+        - name: LAYER_INPUT
+          value: /dev/urandom
         command:
         - /busybox/sh
         - -ce
         - |
-          date > ./timestamp;
-          echo "FROM lambci/lambda@sha256:9f82e54b12a441cdf8dc92f5fc351148e91faa4b2c3b1af7bbf035da50c6f444" > Dockerfile;
-          echo "COPY timestamp" >> /timestamp;
+          mkdir /workspace
+          cd /workspace
+          date > timestamp
+          echo "FROM busybox" > Dockerfile
+          echo "COPY timestamp ." >> Dockerfile
+          for i in $(seq 1 1 $LAYER_COUNT); do echo "RUN dd if=$LAYER_INPUT of=blob$i.bin bs=1M count=$LAYER_SIZE_MB" >> Dockerfile; done
           /kaniko/executor --destination=knative.registry.svc.cluster.local/registrytest/kanikopush:latest
       restartPolicy: Never
   backoffLimit: 4
